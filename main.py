@@ -270,6 +270,7 @@ def create_matrix_Glazer(Gleyser,Rsqrd,umax,X,maxk):
 def calculation_coefficents(X,Sigm,Y):
     if Sigm is not None:
         n,k = X.shape
+        X = np.hstack([np.ones((X.shape[0], 1)), X]) 
         Xt = X.T
         Sigm_inv = np.linalg.inv(Sigm) 
         XtSinv = np.dot(Xt,Sigm_inv) 
@@ -322,7 +323,6 @@ def main():
             Sigm3 = create_matrix_Glazer(Glazer_res,Rsqrd,umax,X,maxk)
             
             Sigm = choose_sigm(Sigm1,Sigm2,Sigm3)
-            X = np.hstack([np.ones((X.shape[0], 1)), X]) 
             calculation_coefficents(X,Sigm,Y)
         else:
             print("Sheet didn't choose")
