@@ -5,34 +5,6 @@ import statsmodels.regression.linear_model as s
 from statsmodels.stats.api import het_goldfeldquandt
 from statsmodels.compat import lzip
 
-"""Find fileName of our xlsx file in dir of project"""
-def find_fileName():
-    files = os.listdir()
-    file_name = ""
-    for file in files:
-        if file.find(".xlsx") >=0:
-            file_name = file
-    return file_name
-
-"""Choose sheet of excel fileS"""
-def find_sheetName(file):
-    sheet_name = ""
-    sheets = file.sheet_names
-    for sheet in sheets:
-        while True:
-            print(f"Do you want to choose {sheet} sheet?(y or n)")
-            answer = input().lower()
-            if answer == "y":
-                sheet_name = sheet
-                break 
-            elif answer == "n":
-                break 
-            else:
-                print("You choose wrong answer. Try again")
-        if len(sheet_name) > 0:
-            break
-    return sheet_name
-
 """Create lineral regression model"""
 def get_model(ind_data,data):
     formula = "{} ~ {}".format("Y", "+".join(ind_data.columns.to_list()))
@@ -295,37 +267,33 @@ def choose_sigm(Sigm1,Sigm2,Sigm3):
 
 def main():
     print("Starting of execution lab 2")
-    file_name = find_fileName()
+    file_name = r'C:\Users\asus\projects\econometrica_lab2\data.xlsx'
+    sheet = 'данные'
     try:
-        file = pd.ExcelFile(file_name)
-        sheet = find_sheetName(file)
-        if sheet != "":
-            data = pd.read_excel(file_name,sheet_name=sheet)
-            data.drop(data.columns[0],axis=1,inplace=True)
+        data = pd.read_excel(file_name,sheet_name=sheet)
+        data.drop(data.columns[0],axis=1,inplace=True)
 
-            independed_variables = data.drop(columns='Y')
+        independed_variables = data.drop(columns='Y')
 
-            model = get_model(independed_variables,data)
-            get_model_info(model)
-            residuals = get_residuals(model)
-            
-            check_normality_of_residuals(residuals)
-            
-            Y,X = get_formated_data(data,independed_variables)
-            maxk = analyse_graps_of_residuals(X,residuals)
+        model = get_model(independed_variables,data)
+        get_model_info(model)
+        residuals = get_residuals(model)
+        
+        check_normality_of_residuals(residuals)
+        
+        Y,X = get_formated_data(data,independed_variables)
+        maxk = analyse_graps_of_residuals(X,residuals)
 
-            spearmean_res,rho = test_Spearman(maxk,X,residuals)
-            GK_res,GK = test_GK(Y,X,maxk)
-            Glazer_res, umax, Rsqrd = test_Glazer(maxk,X,residuals) 
+        spearmean_res,rho = test_Spearman(maxk,X,residuals)
+        GK_res,GK = test_GK(Y,X,maxk)
+        Glazer_res, umax, Rsqrd = test_Glazer(maxk,X,residuals) 
 
-            Sigm1 = create_matrix_Spearmean(spearmean_res,rho,X,maxk)
-            Sigm2 = create_matrix_GK(GK,GK_res,X,maxk)
-            Sigm3 = create_matrix_Glazer(Glazer_res,Rsqrd,umax,X,maxk)
-            
-            Sigm = choose_sigm(Sigm1,Sigm2,Sigm3)
-            calculation_coefficents(X,Sigm,Y)
-        else:
-            print("Sheet didn't choose")
+        Sigm1 = create_matrix_Spearmean(spearmean_res,rho,X,maxk)
+        Sigm2 = create_matrix_GK(GK,GK_res,X,maxk)
+        Sigm3 = create_matrix_Glazer(Glazer_res,Rsqrd,umax,X,maxk)
+        
+        Sigm = choose_sigm(Sigm1,Sigm2,Sigm3)
+        calculation_coefficents(X,Sigm,Y)
     except FileNotFoundError:
         print("File didn't found")
 
